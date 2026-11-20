@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Showroom Management Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>Showroom Management</h1>
+        <p>Chery · OMODA · JAECOO inventory</p>
+      </div>
+      <button type="button" id="addVehicleBtn" class="btn btn-primary">+ Add vehicle</button>
+    </header>
+
+    <main class="container">
+      <section class="stats" aria-label="Dashboard overview">
+        <article class="stat"><span>Total vehicles</span><strong id="statTotal">0</strong></article>
+        <article class="stat stat-available"><span>Available</span><strong id="statAvailable">0</strong></article>
+        <article class="stat stat-reserved"><span>Reserved</span><strong id="statReserved">0</strong></article>
+        <article class="stat stat-sold"><span>Sold</span><strong id="statSold">0</strong></article>
+        <article class="stat"><span>Inventory value</span><strong id="statValue">$0</strong></article>
+        <article class="stat"><span>Average price</span><strong id="statAverage">$0</strong></article>
+      </section>
+
+      <section class="toolbar" aria-label="Search and filters">
+        <form id="filterForm" class="filters">
+          <label class="field field-wide">
+            <span>Search</span>
+            <input type="search" id="searchInput" placeholder="Brand or model" list="vehicleSuggestions" />
+            <datalist id="vehicleSuggestions"></datalist>
+          </label>
+          <label class="field">
+            <span>Brand</span>
+            <select id="brandFilter">
+              <option value="">All brands</option>
+              <option value="Chery">Chery</option>
+              <option value="OMODA">OMODA</option>
+              <option value="JAECOO">JAECOO</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Status</span>
+            <select id="statusFilter">
+              <option value="">All statuses</option>
+              <option value="available">Available</option>
+              <option value="reserved">Reserved</option>
+              <option value="sold">Sold</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Min price</span>
+            <input type="number" id="minPrice" min="0" placeholder="0" />
+          </label>
+          <label class="field">
+            <span>Max price</span>
+            <input type="number" id="maxPrice" min="0" placeholder="Any" />
+          </label>
+          <label class="field">
+            <span>Sort by</span>
+            <select id="sortSelect">
+              <option value="">Default</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="year-desc">Year: newest first</option>
+              <option value="year-asc">Year: oldest first</option>
+            </select>
+          </label>
+          <button type="button" id="resetBtn" class="btn btn-ghost">Reset filters</button>
+        </form>
+      </section>
+
+      <p id="inventoryNotice" class="inventory-notice" role="status"></p>
+      <p id="resultsInfo" class="results-info" aria-live="polite"></p>
+      <div id="feedback" class="feedback" aria-live="polite"></div>
+      <section id="vehicleGrid" class="grid" aria-label="Vehicles"></section>
+    </main>
+
+    <dialog id="formDialog" class="dialog">
+      <form id="vehicleForm" novalidate>
+        <h2 id="formTitle">Add vehicle</h2>
+        <div class="form-grid">
+          <label class="field">
+            <span>Brand</span>
+            <select name="brand" aria-describedby="error-brand">
+              <option value="">Select brand</option>
+              <option value="Chery">Chery</option>
+              <option value="OMODA">OMODA</option>
+              <option value="JAECOO">JAECOO</option>
+            </select>
+            <small class="error" id="error-brand" data-error-for="brand"></small>
+          </label>
+          <label class="field">
+            <span>Model</span>
+            <input type="text" name="model" aria-describedby="error-model" />
+            <small class="error" id="error-model" data-error-for="model"></small>
+          </label>
+          <label class="field">
+            <span>Year</span>
+            <input type="number" name="year" aria-describedby="error-year" />
+            <small class="error" id="error-year" data-error-for="year"></small>
+          </label>
+          <label class="field">
+            <span>Price (USD)</span>
+            <input type="number" name="price" aria-describedby="error-price" />
+            <small class="error" id="error-price" data-error-for="price"></small>
+          </label>
+          <label class="field">
+            <span>Mileage (km)</span>
+            <input type="number" name="mileage" aria-describedby="error-mileage" />
+            <small class="error" id="error-mileage" data-error-for="mileage"></small>
+          </label>
+          <label class="field">
+            <span>Color</span>
+            <input type="text" name="color" aria-describedby="error-color" />
+            <small class="error" id="error-color" data-error-for="color"></small>
+          </label>
+          <label class="field">
+            <span>Status</span>
+            <select name="status" aria-describedby="error-status">
+              <option value="available">Available</option>
+              <option value="reserved">Reserved</option>
+              <option value="sold">Sold</option>
+            </select>
+            <small class="error" id="error-status" data-error-for="status"></small>
+          </label>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" id="cancelBtn" class="btn btn-ghost">Cancel</button>
+          <button type="submit" id="submitBtn" class="btn btn-primary">Add vehicle</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="detailsDialog" class="dialog">
+      <div id="detailsBody"></div>
+      <div class="dialog-actions">
+        <button type="button" id="closeDetailsBtn" class="btn btn-primary">Close</button>
+      </div>
+    </dialog>
+
+    <dialog id="confirmDialog" class="dialog dialog-small">
+      <h2>Delete vehicle</h2>
+      <p id="confirmText"></p>
+      <div class="dialog-actions">
+        <button type="button" id="confirmCancelBtn" class="btn btn-ghost">Cancel</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+      </div>
+    </dialog>
+
+    <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
