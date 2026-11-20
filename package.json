@@ -1,0 +1,13 @@
+{
+  "name": "dashboard-car",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Showroom management dashboard using vanilla JavaScript and JSON Server",
+  "scripts": {
+    "api": "json-server --watch db.json --port 3000",
+    "web": "npx serve . -l 5500"
+  },
+  "devDependencies": {
+    "json-server": "0.17.4"
+  }
+}
